@@ -2,8 +2,12 @@ import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  @Get()
-  defaultRoute(): string {
-    return 'Unauthorized!';
-  }
+
+	@Get()
+	defaultRoute(): any {
+		return {
+			appName: "ShareYourStream-BackEnd",
+			version: "0.0.1",
+		};
+	}
 }
