@@ -8,7 +8,7 @@ import {
 	ObjectIdColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class User extends BaseEntity {
 	@ObjectIdColumn()
 	public id!: ObjectID;
@@ -25,5 +25,9 @@ export class User extends BaseEntity {
 
 	@CreateDateColumn()
 	public createdAt!: Date;
-	
+
+	constructor(_email: string) {
+		super();
+		this.email = _email;
+	}
 }
