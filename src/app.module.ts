@@ -7,7 +7,10 @@ import { AppController } from './app.controller';
 import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 @Module({
 	imports: [
-		ConfigModule.forRoot({ isGlobal: true }),
+		ConfigModule.forRoot({ 
+			isGlobal: true,
+			envFilePath: process.env.NODE_ENV === undefined ? ".env" : ".env.test"
+		}),
 		TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
 		ApiModule,
 	],
