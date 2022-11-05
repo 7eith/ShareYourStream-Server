@@ -1,14 +1,38 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { User } from '@/shared/typeorm/entities/user.entity';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuthentificationHelper } from './authentification.helper';
 import { SignUpDto } from './dto/signUp.dto';
 
 @Injectable()
 export class AuthentificationService {
+	@InjectRepository(User)
+	private readonly repository: Repository<User>;
 
-    public async signUp(_body: SignUpDto): Promise<any> {
-        const { email, password } = _body;
+	@Inject(AuthentificationHelper)
+	private readonly helper: AuthentificationHelper;
 
-        console.log(email)
-        console.log(password)
-        return "";
-    }
+	public async signUpUsingCredentials(
+		_body: SignUpDto,
+	): Promise<AuthentificationResponse> {
+		const { email, password } = _body;
+
+		let user: User = await this.repository.findOne({ where: { email } });
+
+		if (user)
+			throw new HttpException(
+				{ message: ['email.alreadyUsed'] },
+				HttpStatus.FORBIDDEN,
+			);
+
+		user = new User(email);
+		user.password = this.helper.encodePassword(password);
+
+		await this.repository.save(user);
+
+		user = await this.repository.findOne({ where: { email } });
+
+		return this.helper.generateCredentialsTokens(user);
+	}
 }

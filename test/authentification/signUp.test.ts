@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
+import { AppModule } from '@/app.module';
 
 describe('AuthentificationController - SignUp', () => {
 	let app: INestApplication;
@@ -15,47 +15,67 @@ describe('AuthentificationController - SignUp', () => {
 		await app.init();
 	});
 
-	it('use empty DTO', () => {
+	it('should create an user using credentials', async () => {
+		await request(app.getHttpServer())
+			.post('/authentification/signUp')
+			.send({
+				email: 'seith@shareyourstream.com',
+				password: 'TestingPassword7!',
+			})
+			.expect(201);
+	});
+
+	it("shouldn't create an user using empty body", () => {
 		return request(app.getHttpServer())
 			.post('/authentification/signUp')
 			.expect(400);
 	});
 
-	it('use DTO with useless param', () => {
+	it("shouldn't create an user using useless params", () => {
 		return request(app.getHttpServer())
 			.post('/authentification/signUp')
 			.send({ uselessParam: 42 })
 			.expect(400);
 	});
 
-	it('use invalid email', async () => {
+	it("shouldn't create an user using invalid email", async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "badEmail", password: "goodPassword" });
-		
-		expect(response.body.message).toContain("invalidEmail")
+			.send({ email: 'badEmail', password: 'goodPassword' });
+
+		expect(response.body.message).toContain('invalidEmail');
 	});
 
-	it('use invalid password', async () => {
+	it("shouldn't create an user using invalid password type", async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "goodEmail@gmail.com", password: 42 });
-		
-		expect(response.body.message).toContain("invalidType");
+			.send({ email: 'goodEmail@gmail.com', password: 42 });
+
+		expect(response.body.message).toContain('invalidType');
 	});
 
-	it('use too short password', async () => {
+	it("shouldn't create an user using invalid password length", async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "goodEmail@gmail.com", password: "short" });
-		
-		expect(response.body.message).toContain("invalidLength");
+			.send({ email: 'goodEmail@gmail.com', password: 'short' });
+
+		expect(response.body.message).toContain('invalidLength');
 	});
 
-	// it('/noRouteExisting (GET)', () => {
-	// 	return request(app.getHttpServer())
-	// 		.get('/noRouteExisting')
-	// 		.expect(404)
-	// 		.expect({ statusCode: 404, message: "Cannot GET /noRouteExisting", error: "Not Found"});
-	// });
+	it("shouldn't create an user using duplicated email", async () => {
+		await request(app.getHttpServer())
+			.post('/authentification/signUp')
+			.send({
+				email: 'duplicated@shareyourstream.com',
+				password: 'TestingPassword7!',
+			});
+
+		await request(app.getHttpServer())
+			.post('/authentification/signUp')
+			.send({
+				email: 'duplicated@shareyourstream.com',
+				password: 'TestingPassword7!',
+			})
+			.expect(403);
+	});
 });
