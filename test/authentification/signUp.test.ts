@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
+import { AppModule } from '@/app.module';
 
 describe('AuthentificationController - SignUp', () => {
 	let app: INestApplication;
@@ -31,25 +31,25 @@ describe('AuthentificationController - SignUp', () => {
 	it('use invalid email', async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "badEmail", password: "goodPassword" });
-		
-		expect(response.body.message).toContain("invalidEmail")
+			.send({ email: 'badEmail', password: 'goodPassword' });
+
+		expect(response.body.message).toContain('invalidEmail');
 	});
 
 	it('use invalid password', async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "goodEmail@gmail.com", password: 42 });
-		
-		expect(response.body.message).toContain("invalidType");
+			.send({ email: 'goodEmail@gmail.com', password: 42 });
+
+		expect(response.body.message).toContain('invalidType');
 	});
 
 	it('use too short password', async () => {
 		const response = await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: "goodEmail@gmail.com", password: "short" });
-		
-		expect(response.body.message).toContain("invalidLength");
+			.send({ email: 'goodEmail@gmail.com', password: 'short' });
+
+		expect(response.body.message).toContain('invalidLength');
 	});
 
 	// it('/noRouteExisting (GET)', () => {
