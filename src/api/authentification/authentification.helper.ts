@@ -12,7 +12,7 @@ import { User } from '@/shared/typeorm/entities/user.entity';
 
 enum JwtPayloadType {
 	ACCESS_TOKEN,
-	REFRESH_TOKEN
+	REFRESH_TOKEN,
 }
 
 @Injectable()
@@ -26,14 +26,17 @@ export class AuthentificationHelper {
 	}
 
 	private generateJwtPayload(user: User, type: JwtPayloadType): string {
-		return this.jwt.sign({
-			id: user.id,
-			role: "Administrator" // TODO: create Roles 
-		}, { 
-			expiresIn: type === JwtPayloadType.ACCESS_TOKEN ? "1d" : "30d",
-			issuer: "ShareYourStream",
-			subject: user.email
-		});
+		return this.jwt.sign(
+			{
+				id: user.id,
+				role: 'Administrator', // TODO: create Roles
+			},
+			{
+				expiresIn: type === JwtPayloadType.ACCESS_TOKEN ? '1d' : '30d',
+				issuer: 'ShareYourStream',
+				subject: user.email,
+			},
+		);
 	}
 
 	public generateAccessToken(user: User): string {
@@ -44,14 +47,14 @@ export class AuthentificationHelper {
 		return this.generateJwtPayload(user, JwtPayloadType.REFRESH_TOKEN);
 	}
 
-	public generateCredentialsTokens(user: User) : AuthentificationResponse {
+	public generateCredentialsTokens(user: User): AuthentificationResponse {
 		const accessToken = this.generateAccessToken(user);
 		const refreshToken = this.generateRefreshToken(user);
 
 		return {
 			token: accessToken,
-			refresh_token: refreshToken
-		}
+			refresh_token: refreshToken,
+		};
 	}
 
 	public async decode(token: string): Promise<unknown> {

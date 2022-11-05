@@ -7,14 +7,15 @@ import { SignUpDto } from './dto/signUp.dto';
 
 @Injectable()
 export class AuthentificationService {
-
 	@InjectRepository(User)
 	private readonly repository: Repository<User>;
 
 	@Inject(AuthentificationHelper)
 	private readonly helper: AuthentificationHelper;
 
-	public async signUpUsingCredentials(_body: SignUpDto): Promise<AuthentificationResponse> {
+	public async signUpUsingCredentials(
+		_body: SignUpDto,
+	): Promise<AuthentificationResponse> {
 		const { email, password } = _body;
 
 		let user: User = await this.repository.findOne({ where: { email } });

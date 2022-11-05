@@ -18,7 +18,10 @@ describe('AuthentificationController - SignUp', () => {
 	it('should create an user using credentials', async () => {
 		await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: 'seith@shareyourstream.com', password: 'TestingPassword7!' })
+			.send({
+				email: 'seith@shareyourstream.com',
+				password: 'TestingPassword7!',
+			})
 			.expect(201);
 	});
 
@@ -62,11 +65,17 @@ describe('AuthentificationController - SignUp', () => {
 	it("shouldn't create an user using duplicated email", async () => {
 		await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: 'duplicated@shareyourstream.com', password: 'TestingPassword7!' });
+			.send({
+				email: 'duplicated@shareyourstream.com',
+				password: 'TestingPassword7!',
+			});
 
 		await request(app.getHttpServer())
 			.post('/authentification/signUp')
-			.send({ email: 'duplicated@shareyourstream.com', password: 'TestingPassword7!' })
-			.expect(403)
+			.send({
+				email: 'duplicated@shareyourstream.com',
+				password: 'TestingPassword7!',
+			})
+			.expect(403);
 	});
 });

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
 import { AppModule } from '@/app.module';
-import { Connection, createConnection } from "mongoose";
+import { Connection, createConnection } from 'mongoose';
 
 describe('App', () => {
 	let app: INestApplication;
@@ -39,7 +39,7 @@ describe('App', () => {
 afterAll(async () => {
 	dotenv.config();
 
-	let mongoClient : Connection = createConnection(process.env.MONGODB_URL);
+	const mongoClient: Connection = createConnection(process.env.MONGODB_URL);
 	await mongoClient.dropDatabase();
 	await mongoClient.close();
-})
+});

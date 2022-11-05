@@ -7,18 +7,17 @@ import { AuthentificationHelper } from '../authentification.helper';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    
-  @Inject(AuthentificationHelper)
-  private readonly helper: AuthentificationHelper;
+	@Inject(AuthentificationHelper)
+	private readonly helper: AuthentificationHelper;
 
-  constructor(@Inject(ConfigService) config: ConfigService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get('JWT_KEY'),
-    });
-  }
+	constructor(@Inject(ConfigService) config: ConfigService) {
+		super({
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			secretOrKey: config.get('JWT_KEY'),
+		});
+	}
 
-  private validate(payload: string): Promise<User | never> {
-    return this.helper.validateUser(payload);
-  }
+	private validate(payload: string): Promise<User | never> {
+		return this.helper.validateUser(payload);
+	}
 }
