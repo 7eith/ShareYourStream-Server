@@ -3,9 +3,9 @@ import { IsEmail, IsString } from 'class-validator';
 
 export class SignInDto {
 	@Trim()
-	@IsEmail()
+	@IsEmail({}, { message: 'invalidEmail' })
 	public readonly email!: string;
 
-	@IsString()
+	@IsString({ message: 'invalidType' })
 	public readonly password!: string;
 }
