@@ -6,6 +6,7 @@ import {
 	UsePipes,
 } from '@nestjs/common';
 import { AuthentificationService } from './authentification.service';
+import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signUp.dto';
 
 @Controller('authentification')
@@ -20,5 +21,15 @@ export class AutentificationController {
 		@Body() body: SignUpDto,
 	): Promise<AuthentificationResponse> {
 		return this.service.signUpUsingCredentials(body);
+	}
+
+	@Post('/signIn')
+	@UsePipes(
+		new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+	)
+	private signInUsingCredentials(
+		@Body() body: SignInDto,
+	): Promise<AuthentificationResponse> {
+		return this.service.signInUsingCredentials(body);
 	}
 }
