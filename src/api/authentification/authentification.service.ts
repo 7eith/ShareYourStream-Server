@@ -14,7 +14,7 @@ export class AuthentificationService {
 	@Inject(AuthentificationHelper)
 	private readonly helper: AuthentificationHelper;
 
-	public async signUp(_body: SignUpDto): Promise<AuthentificationResponse> {
+	public async signUpUsingCredentials(_body: SignUpDto): Promise<AuthentificationResponse> {
 		const { email, password } = _body;
 
 		let user: User = await this.repository.findOne({ where: { email } });

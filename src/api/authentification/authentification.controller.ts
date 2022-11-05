@@ -16,7 +16,7 @@ export class AutentificationController {
 	@UsePipes(
 		new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
 	)
-	private signUp(@Body() body: SignUpDto): Promise<AuthentificationResponse> {
-		return this.service.signUp(body);
+	private signUpUsingCredentials(@Body() body: SignUpDto): Promise<AuthentificationResponse> {
+		return this.service.signUpUsingCredentials(body);
 	}
 }
