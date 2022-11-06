@@ -32,4 +32,15 @@ export class AutentificationController {
 	): Promise<AuthentificationResponse> {
 		return this.service.signInUsingCredentials(body);
 	}
+
+	/**
+	 * @Spotify Providers
+	 */
+
+	@Post('/spotify')
+	private authUsingSpotify(
+		@Body('code') code: string
+	) : Promise<any> {
+		return this.service.authUsingSpotify(code);
+	}
 }

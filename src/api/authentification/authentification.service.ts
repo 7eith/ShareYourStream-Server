@@ -57,4 +57,17 @@ export class AuthentificationService {
 	
 		return this.helper.generateCredentialsTokens(user);
 	}
+
+	public async authUsingSpotify(
+		_code: string
+	) : Promise<AuthentificationResponse> {
+		if (!_code || _code === undefined || _code.length === 0)
+			throw new HttpException(
+				{ message: 'invalidCode' },
+				HttpStatus.BAD_REQUEST
+			)
+		
+		
+		return null;
+	}
 }
