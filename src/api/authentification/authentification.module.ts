@@ -6,8 +6,10 @@ import { User } from '@/shared/typeorm/entities/user.entity';
 import { AuthentificationHelper } from './authentification.helper';
 
 import { JwtModule } from '@nestjs/jwt';
+import { HttpModule } from "@nestjs/axios";
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
+import { SpotifyAuthentificationService } from '@/shared/services/spotify/auth.service';
 
 @Module({
 	imports: [
@@ -20,8 +22,9 @@ import { ConfigService } from '@nestjs/config';
 			}),
 		}),
 		TypeOrmModule.forFeature([User]),
+		HttpModule
 	],
 	controllers: [AutentificationController],
-	providers: [AuthentificationService, AuthentificationHelper],
+	providers: [AuthentificationService, AuthentificationHelper, SpotifyAuthentificationService],
 })
 export class AuthentificationModule {}

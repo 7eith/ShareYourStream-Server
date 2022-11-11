@@ -1,3 +1,4 @@
+import { SpotifyAuthentificationService } from '@/shared/services/spotify/auth.service';
 import { User } from '@/shared/typeorm/entities/user.entity';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +15,9 @@ export class AuthentificationService {
 	@Inject(AuthentificationHelper)
 	private readonly helper: AuthentificationHelper;
 
+	@Inject(SpotifyAuthentificationService)
+	private readonly spotifyAuth: SpotifyAuthentificationService;
+  
 	public async signUpUsingCredentials(
 		_body: SignUpDto,
 	): Promise<AuthentificationResponse> {
@@ -67,7 +71,47 @@ export class AuthentificationService {
 				HttpStatus.BAD_REQUEST
 			)
 		
+		let spotifyAuthResponse : SpotifyAuthentificationResponse;
+		let userProfile : SpotifyUserProfile;
+
+		try {
+			spotifyAuthResponse = await this.spotifyAuth.generateAccessToken(_code);
+			userProfile = await this.spotifyAuth.getUserProfile(spotifyAuthResponse.access_token);
+		}
+		catch (_error) {
+			throw new HttpException(
+				{ message: "invalidCode" },
+				HttpStatus.BAD_REQUEST
+			)
+		}
 		
-		return null;
+		if (!userProfile.email) {
+			throw new HttpException(
+				{ message: 'invalidScope' },
+				HttpStatus.FORBIDDEN
+			)
+		}
+
+		let user: User = await this.repository.findOne({ where: { spotifyId: userProfile.id }});
+
+		if (!user) {
+			
+			user = new User(userProfile.email);
+			user.spotifyId = userProfile.id;
+			user.spotifyAccessToken = spotifyAuthResponse.access_token;
+			user.spotifyRefreshToken = spotifyAuthResponse.refresh_token;
+			user.spotifyScopes = spotifyAuthResponse.scope;
+
+		} else {
+
+			user.spotifyAccessToken = spotifyAuthResponse.access_token;
+			user.spotifyRefreshToken = spotifyAuthResponse.refresh_token;
+			user.spotifyScopes = spotifyAuthResponse.scope;
+
+		}
+		
+		await this.repository.save(user);
+		user = await this.repository.findOne({ where: { spotifyId: userProfile.id }});
+		return this.helper.generateCredentialsTokens(user);
 	}
 }

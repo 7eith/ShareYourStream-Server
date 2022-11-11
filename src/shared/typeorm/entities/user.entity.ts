@@ -23,6 +23,18 @@ export class User extends BaseEntity {
 	@Column()
 	public username?: string;
 
+	@Column()
+	public spotifyId?: string;
+
+	@Column()
+	public spotifyAccessToken?: string;
+
+	@Column()
+	public spotifyRefreshToken?: string;
+
+	@Column()
+	public spotifyScopes?: string;
+
 	@CreateDateColumn()
 	public createdAt!: Date;
 
