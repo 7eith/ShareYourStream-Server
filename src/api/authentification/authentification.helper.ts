@@ -62,7 +62,7 @@ export class AuthentificationHelper {
 	}
 
 	public async validateUser(decoded: any): Promise<User> {
-		return this.repository.findOne({ where: { id: decoded.id } });
+		return this.repository.findOne(decoded.id);
 	}
 
 	public isPasswordValid(password: string, userPassword: string): boolean {
