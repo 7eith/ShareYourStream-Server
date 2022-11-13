@@ -6,6 +6,7 @@ import {
 	Entity,
 	ObjectID,
 	ObjectIdColumn,
+	PrimaryColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -29,6 +30,7 @@ export class User extends BaseEntity {
 	@Column()
 	public spotifyAccessToken?: string;
 
+	@Exclude()
 	@Column()
 	public spotifyRefreshToken?: string;
 
