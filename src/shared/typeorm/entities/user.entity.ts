@@ -5,8 +5,7 @@ import {
 	CreateDateColumn,
 	Entity,
 	ObjectID,
-	ObjectIdColumn,
-	PrimaryColumn,
+	ObjectIdColumn
 } from 'typeorm';
 
 @Entity('users')
@@ -24,6 +23,10 @@ export class User extends BaseEntity {
 	@Column()
 	public username?: string;
 
+	/**
+	 * @Spotify 
+	 */
+
 	@Column()
 	public spotifyId?: string;
 
@@ -36,6 +39,23 @@ export class User extends BaseEntity {
 
 	@Column()
 	public spotifyScopes?: string;
+
+	/**
+	 * @Discord 
+	 */
+
+	@Column()
+	public discordId?: string;
+
+	@Column()
+	public discordAccessToken?: string;
+
+	@Exclude()
+	@Column()
+	public discordRefreshToken?: string;
+
+	@Column()
+	public discordScopes?: string;
 
 	@CreateDateColumn()
 	public createdAt!: Date;

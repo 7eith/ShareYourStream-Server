@@ -1,41 +1,37 @@
-import { User } from '@/shared/typeorm/entities/user.entity';
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
-export class SpotifyAuthentificationService {
+export class DiscordService {
     @Inject(ConfigService)
     private readonly config: ConfigService;
 
     @Inject(HttpService)
 	private readonly httpService: HttpService;
 
-	public async generateAccessToken(_code: string) : Promise<SpotifyAuthentificationResponse> {
-
-        let encodedHeader = (Buffer.from(this.config.get<string>('SPOTIFY_CLIENT_ID') + ':' + this.config.get<string>('SPOTIFY_SECRET_ID')).toString('base64'));
+	public async generateAccessToken(_code: string) : Promise<OAuthTokenResponse> {
 
         let headers = {
-            "Authorization": `Basic ${encodedHeader}`,
             "Content-Type": "application/x-www-form-urlencoded"
         }
         
         let body = {
+            client_id: this.config.get<string>('DISCORD_CLIENT_ID'),
+            client_secret: this.config.get<string>('DISCORD_SECRET_ID'),
             code: _code,
-            redirect_uri: "http://localhost:3000/auth/spotify",
+            redirect_uri: "http://localhost:3000/auth/discord",
             grant_type: "authorization_code"
         }
 
         return new Promise(async (resolve, reject) => {
             try {
                 const { data } = await this.httpService.axiosRef.post(
-                    "https://accounts.spotify.com/api/token",
+                    "https://discord.com/api/oauth2/token",
                     body,
                     { headers }
                 )
-        
+
                 return resolve(data);
             } 
             catch (error) {
@@ -53,7 +49,7 @@ export class SpotifyAuthentificationService {
         })
 	}
 
-    public async getUserProfile(_accessToken: string) : Promise<SpotifyUserProfile> {
+    public async getUserProfile(_accessToken: string) : Promise<DiscordUserProfile> {
 
         let headers = {
             "Authorization": `Bearer ${_accessToken}`
@@ -61,8 +57,8 @@ export class SpotifyAuthentificationService {
 
         return new Promise(async (resolve, reject) => {
             try {
-                const { data } = await this.httpService.axiosRef.get<SpotifyUserProfile>(
-                    "https://api.spotify.com/v1/me",
+                const { data } = await this.httpService.axiosRef.get<DiscordUserProfile>(
+                    "https://discord.com/api/users/@me",
                     { headers }
                 )
         
