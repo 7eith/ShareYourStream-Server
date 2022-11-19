@@ -1,19 +1,16 @@
-import { User } from '@/shared/typeorm/entities/user.entity';
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
-export class SpotifyAuthentificationService {
+export class SpotifyService {
     @Inject(ConfigService)
     private readonly config: ConfigService;
 
     @Inject(HttpService)
 	private readonly httpService: HttpService;
 
-	public async generateAccessToken(_code: string) : Promise<SpotifyAuthentificationResponse> {
+	public async generateAccessToken(_code: string) : Promise<OAuthTokenResponse> {
 
         let encodedHeader = (Buffer.from(this.config.get<string>('SPOTIFY_CLIENT_ID') + ':' + this.config.get<string>('SPOTIFY_SECRET_ID')).toString('base64'));
 
