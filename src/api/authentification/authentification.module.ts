@@ -9,8 +9,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from "@nestjs/axios";
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
-import { SpotifyAuthentificationService } from '@/shared/services/spotify/auth.service';
+import { SpotifyService } from '@/shared/services/spotify/spotify.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { DiscordService } from '@/shared/services/discord/discord.service';
 
 @Module({
 	imports: [
@@ -26,6 +27,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 		HttpModule
 	],
 	controllers: [AutentificationController],
-	providers: [AuthentificationService, AuthentificationHelper, SpotifyAuthentificationService, JwtStrategy],
+	providers: [AuthentificationService, AuthentificationHelper, SpotifyService, DiscordService, JwtStrategy],
 })
 export class AuthentificationModule {}

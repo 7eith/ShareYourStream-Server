@@ -40,7 +40,14 @@ export class AutentificationController {
 	@Post('/spotify')
 	private authUsingSpotify(
 		@Body('code') code: string
-	) : Promise<any> {
+	) : Promise<AuthentificationResponse> {
 		return this.service.authUsingSpotify(code);
+	}
+
+	@Post('/discord')
+	private authUsingDiscord(
+		@Body('code') code: string
+	) : Promise<AuthentificationResponse> {
+		return this.service.authUsingDiscord(code);
 	}
 }

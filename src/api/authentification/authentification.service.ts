@@ -1,4 +1,5 @@
-import { SpotifyAuthentificationService } from '@/shared/services/spotify/auth.service';
+import { DiscordService } from '@/shared/services/discord/discord.service';
+import { SpotifyService } from '@/shared/services/spotify/spotify.service';
 import { User } from '@/shared/typeorm/entities/user.entity';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,9 +16,12 @@ export class AuthentificationService {
 	@Inject(AuthentificationHelper)
 	private readonly helper: AuthentificationHelper;
 
-	@Inject(SpotifyAuthentificationService)
-	private readonly spotifyAuth: SpotifyAuthentificationService;
-  
+	@Inject(SpotifyService)
+	private readonly spotifyService: SpotifyService;
+	
+	@Inject(DiscordService)
+	private readonly discordService: DiscordService;
+
 	public async signUpUsingCredentials(
 		_body: SignUpDto,
 	): Promise<AuthentificationResponse> {
@@ -71,12 +75,12 @@ export class AuthentificationService {
 				HttpStatus.BAD_REQUEST
 			)
 		
-		let spotifyAuthResponse : SpotifyAuthentificationResponse;
+		let OAuthResponse : OAuthTokenResponse;
 		let userProfile : SpotifyUserProfile;
 
 		try {
-			spotifyAuthResponse = await this.spotifyAuth.generateAccessToken(_code);
-			userProfile = await this.spotifyAuth.getUserProfile(spotifyAuthResponse.access_token);
+			OAuthResponse = await this.spotifyService.generateAccessToken(_code);
+			userProfile = await this.spotifyService.getUserProfile(OAuthResponse.access_token);
 		}
 		catch (_error) {
 			throw new HttpException(
@@ -98,20 +102,64 @@ export class AuthentificationService {
 			
 			user = new User(userProfile.email);
 			user.spotifyId = userProfile.id;
-			user.spotifyAccessToken = spotifyAuthResponse.access_token;
-			user.spotifyRefreshToken = spotifyAuthResponse.refresh_token;
-			user.spotifyScopes = spotifyAuthResponse.scope;
+			
+		} 
 
-		} else {
-
-			user.spotifyAccessToken = spotifyAuthResponse.access_token;
-			user.spotifyRefreshToken = spotifyAuthResponse.refresh_token;
-			user.spotifyScopes = spotifyAuthResponse.scope;
-
-		}
+		user.spotifyAccessToken = OAuthResponse.access_token;
+		user.spotifyRefreshToken = OAuthResponse.refresh_token;
+		user.spotifyScopes = OAuthResponse.scope;
 		
 		await this.repository.save(user);
 		user = await this.repository.findOne({ where: { spotifyId: userProfile.id }});
+		return this.helper.generateCredentialsTokens(user);
+	}
+
+	public async authUsingDiscord(
+		_code: string
+	) : Promise<AuthentificationResponse> {
+		if (!_code || _code === undefined || _code.length === 0)
+			throw new HttpException(
+				{ message: 'invalidCode' },
+				HttpStatus.BAD_REQUEST
+			)
+		
+		let OAuthResponse : OAuthTokenResponse;
+		let userProfile : DiscordUserProfile;
+
+		try {
+			OAuthResponse = await this.discordService.generateAccessToken(_code);
+			userProfile = await this.discordService.getUserProfile(OAuthResponse.access_token);
+		}
+		catch (_error) {
+			console.log(_error)
+			throw new HttpException(
+				{ message: "invalidCode" },
+				HttpStatus.BAD_REQUEST
+			)
+		}
+		
+		if (!userProfile.email) {
+			throw new HttpException(
+				{ message: 'invalidScope' },
+				HttpStatus.FORBIDDEN
+			)
+		}
+
+		let user: User = await this.repository.findOne({ where: { discordId: userProfile.id }});
+
+		if (!user) {
+			
+			user = new User(userProfile.email);
+			user.discordId = userProfile.id;
+
+		}
+	
+		user.discordAccessToken = OAuthResponse.access_token;
+		user.discordRefreshToken = OAuthResponse.refresh_token;
+		user.discordScopes = OAuthResponse.scope;
+		
+		await this.repository.save(user);
+		user = await this.repository.findOne({ where: { discordId: userProfile.id }});
 		return this.helper.generateCredentialsTokens(user);
 	}
 }
