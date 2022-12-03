@@ -22,4 +22,10 @@ export class ProfileController {
 	private fetchProfile(@Req() { user } : Request): Promise<User> {
 		return this.service.fetchProfile(<User> user);
 	}
+
+	@Post('spotify/link')
+	@UseGuards(JwtAuthGuard)
+	private linkSpotify(@Req() { user } : Request, @Body('code') code: string) : Promise<any> {
+		return this.service.linkSpotify(<User> user, code);
+	}
 }
