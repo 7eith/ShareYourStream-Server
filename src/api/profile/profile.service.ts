@@ -65,4 +65,27 @@ export class ProfileService {
 
         return user;
 	}
+
+	public async refreshSpotifyToken(_user: User): Promise<any> {	
+		let OAuthResponse : OAuthTokenResponse;
+
+		try {
+			OAuthResponse = await this.spotifyService.refreshSpotifyAccessToken(_user.spotifyRefreshToken);
+		}
+		catch (_error) {
+			throw new HttpException(
+				{ message: "invalidCode" },
+				HttpStatus.BAD_REQUEST
+			)
+		}
+
+		_user.spotifyAccessToken = OAuthResponse.access_token;
+		_user.spotifyRefreshToken = OAuthResponse.refresh_token;
+		_user.spotifyScopes = OAuthResponse.scope;
+
+		await this.repository.save(_user);
+
+        return OAuthResponse;
+	}
+
 }

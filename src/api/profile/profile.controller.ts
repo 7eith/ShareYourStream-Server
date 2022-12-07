@@ -28,4 +28,10 @@ export class ProfileController {
 	private linkSpotify(@Req() { user } : Request, @Body('code') code: string) : Promise<any> {
 		return this.service.linkSpotify(<User> user, code);
 	}
+
+	@Post('spotify/refreshToken')
+	@UseGuards(JwtAuthGuard)
+	private refreshSpotifyToken(@Req() { user } : Request) : Promise<any> {
+		return this.service.refreshSpotifyToken(<User> user);
+	}
 }

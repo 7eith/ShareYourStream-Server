@@ -50,6 +50,45 @@ export class SpotifyService {
         })
 	}
 
+    public async refreshSpotifyAccessToken(_refreshToken: string) : Promise<OAuthTokenResponse> {
+
+        let encodedHeader = (Buffer.from(this.config.get<string>('SPOTIFY_CLIENT_ID') + ':' + this.config.get<string>('SPOTIFY_SECRET_ID')).toString('base64'));
+
+        let headers = {
+            "Authorization": `Basic ${encodedHeader}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+        
+        let body = {
+            refresh_token: _refreshToken,
+            grant_type: "refresh_token"
+        }
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { data } = await this.httpService.axiosRef.post(
+                    "https://accounts.spotify.com/api/token",
+                    body,
+                    { headers }
+                )
+        
+                return resolve(data);
+            } 
+            catch (error) {
+                if (error.response) {
+                    return reject({
+                        code: error.response.status,
+                        message: error.response.statusText
+                    })
+                }
+                return reject({
+                    code: 500,
+                    message: "Unexpected Error"
+                })
+            }
+        })
+	}
+
     public async getUserProfile(_accessToken: string) : Promise<SpotifyUserProfile> {
 
         let headers = {
